@@ -1,0 +1,15 @@
+<div class="container mt-3" th:fragment="submenu">
+    <div class="container-fluid">
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+            <input type="hidden" id="firstCategoryId" th:value="${categories[0].id}" />
+            <ul class="nav" id="categoriesNav">
+                <li class="nav-item" th:each="category : ${categories}">
+                    <a class="nav-link" href="#"
+                       th:text="${category.name}"
+                       th:data-id="${category.id}"
+                       onclick="showLinks(this)"></a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>

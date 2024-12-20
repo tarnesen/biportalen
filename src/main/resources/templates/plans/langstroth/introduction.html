@@ -1,0 +1,35 @@
+<div class="container mt-3" th:fragment="content">
+    <div class="container">
+        <div class="row">
+            <!-- a centered drop down box to select chapters -->
+            <select class="form-select" id="chapter-select" aria-label="Select chapter" onchange="goto()">
+                <option selected>Choose a chapter</option>
+                <option value="introduction">Introduction</option>
+                <option value="tools">Tools</option>
+                <option value="materials">Materials</option>
+                <option value="cutting">Cutting</option>
+                <option value="assembly">Assembly</option>
+                <option value="painting">Painting</option>
+                <option value="frames">Frames</option>
+                <option value="foundation">Foundation</option>
+                <option value="hive">Hive</option>
+                <option value="roof">Roof</option>
+                <option value="conclusion">Conclusion</option>
+            </select>
+        </div>
+        <div class="row">
+        <h1 th:text="#{plans.langstroth.introduction.title}">Introduction</h1>
+        <p th:text="#{plans.langstroth.introduction.text1}"></p>
+        <p th:text="#{plans.langstroth.introduction.text2}"></p>
+        <p th:text="#{plans.langstroth.introduction.text3}"></p>
+        <p th:text="#{plans.langstroth.introduction.text4}"></p>
+        </div>
+    </div>
+    <script>
+        function goto() {
+            var e = document.getElementById("chapter-select");
+            var chapter = e.options[e.selectedIndex].value;
+            window.location.href = "/plans/langstroth/" + chapter;
+        }
+    </script>
+</div>

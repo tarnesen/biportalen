@@ -1,0 +1,160 @@
+<div class="container mt-3" th:fragment="content">
+    <div class="container">
+        <h6 th:utext="#{links.welcome}">Länkar</h6>
+        <div id="linksContainer">
+            <!-- Links will be dynamically populated here -->
+        </div>
+    </div>
+    <script>
+        function showLinks(element) {
+            var categoryId = element.getAttribute("data-id"); // Get categoryId from the clicked element
+            $.ajax({
+                type: "GET",
+                url: "/user/links/getLinks", // Adjust the endpoint to match your visitor endpoint
+                data: {
+                    categoryId: categoryId
+                },
+                success: function (data) {
+                    var linksContainer = document.getElementById("linksContainer");
+                    linksContainer.innerHTML = ""; // Clear previous links
+                    if (data.length > 0) {
+                        var row = document.createElement("div");
+                        row.className = "row"; // Use Bootstrap row for layout
+                        data.forEach(link => {
+                            var col = document.createElement("div");
+                            col.className = "col-md-4"; // Set column size (adjust as needed)
+
+                            var card = document.createElement("div");
+                            card.className = "card mb-4 shadow-sm"; // Bootstrap card with some margin and shadow
+
+                            // Create SVG element
+                            var svgContainer = document.createElement("div");
+                            svgContainer.className = "card-img-top text-center py-3"; // Styling for SVG container
+                            svgContainer.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                            <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                            <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4 4 0 0 1-.82 1H12a3 3 0 1 0 0-6z"/>
+                        </svg>
+                    `;
+
+                            var cardBody = document.createElement("div");
+                            cardBody.className = "card-body";
+
+                            var cardTitle = document.createElement("h5");
+                            cardTitle.className = "card-title";
+                            cardTitle.innerText = link.title;
+
+                            var cardText = document.createElement("p");
+                            cardText.className = "card-text";
+                            cardText.innerHTML = link.description;
+
+                            var cardLink = document.createElement("a");
+                            cardLink.className = "btn btn-primary";
+                            cardLink.href = link.url;
+                            cardLink.target = "_blank"; // Open in a new tab
+                            cardLink.innerText = "Besök länk"; // Button text
+
+                            // Append elements to card
+                            card.appendChild(svgContainer); // Add SVG
+                            cardBody.appendChild(cardTitle);
+                            cardBody.appendChild(cardText);
+                            cardBody.appendChild(cardLink);
+                            card.appendChild(cardBody);
+
+                            col.appendChild(card);
+                            row.appendChild(col);
+                        });
+                        linksContainer.appendChild(row);
+                    } else {
+                        linksContainer.innerHTML = "<p>Inga länkar i denna kategori.</p>"; // No links message
+                    }
+                },
+                error: function (e) {
+                    alert("Något gick fel: " + e.responseText);
+                }
+            });
+        }
+
+    </script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            let firstCategoryId = document.getElementById("firstCategoryId").value; // Get the first category ID
+            if (firstCategoryId) {
+                loadLinksForCategory(firstCategoryId); // Fetch links for the first category
+            }
+        });
+
+        function loadLinksForCategory(categoryId) {
+            $.ajax({
+                type: "GET",
+                url: "/user/links/getLinks",
+                data: {
+                    categoryId: categoryId
+                },
+                success: function (data) {
+                    var linksContainer = document.getElementById("linksContainer");
+                    linksContainer.innerHTML = ""; // Clear previous content
+
+                    if (data.length > 0) {
+                        var row = document.createElement("div");
+                        row.className = "row"; // Use Bootstrap row for layout
+
+                        data.forEach(link => {
+                            var col = document.createElement("div");
+                            col.className = "col-md-4"; // Set column size (adjust as needed)
+
+                            var card = document.createElement("div");
+                            card.className = "card mb-4 shadow-sm"; // Bootstrap card with some margin and shadow
+
+                            // Create SVG element
+                            var svgContainer = document.createElement("div");
+                            svgContainer.className = "card-img-top text-center py-3"; // Styling for SVG container
+                            svgContainer.innerHTML = `
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" fill="currentColor" class="bi bi-link" viewBox="0 0 16 16">
+                            <path d="M6.354 5.5H4a3 3 0 0 0 0 6h3a3 3 0 0 0 2.83-4H9q-.13 0-.25.031A2 2 0 0 1 7 10.5H4a2 2 0 1 1 0-4h1.535c.218-.376.495-.714.82-1z"/>
+                            <path d="M9 5.5a3 3 0 0 0-2.83 4h1.098A2 2 0 0 1 9 6.5h3a2 2 0 1 1 0 4h-1.535a4 4 0 0 1-.82 1H12a3 3 0 1 0 0-6z"/>
+                        </svg>
+                    `;
+
+                            var cardBody = document.createElement("div");
+                            cardBody.className = "card-body";
+
+                            var cardTitle = document.createElement("h5");
+                            cardTitle.className = "card-title";
+                            cardTitle.innerText = link.title;
+
+                            var cardText = document.createElement("p");
+                            cardText.className = "card-text";
+                            cardText.innerHTML = link.description;
+
+                            var cardLink = document.createElement("a");
+                            cardLink.className = "btn btn-primary";
+                            cardLink.href = link.url;
+                            cardLink.target = "_blank"; // Open in a new tab
+                            cardLink.innerText = "Besök länk"; // Button text
+
+                            // Append elements to card
+                            card.appendChild(svgContainer); // Add SVG
+                            cardBody.appendChild(cardTitle);
+                            cardBody.appendChild(cardText);
+                            cardBody.appendChild(cardLink);
+                            card.appendChild(cardBody);
+
+                            col.appendChild(card);
+                            row.appendChild(col);
+                        });
+
+                        linksContainer.appendChild(row); // Add the row to the container
+                    } else {
+                        linksContainer.innerHTML = "<p>Inga länkar i denna kategori.</p>"; // No links message
+                    }
+                },
+                error: function (e) {
+                    alert("Något gick fel: " + e.responseText);
+                }
+            });
+        }
+
+
+    </script>
+</div>

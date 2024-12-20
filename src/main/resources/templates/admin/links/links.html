@@ -1,0 +1,257 @@
+<div class="container mt-3" th:fragment="content">
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h1>Kategorier</h1>
+                <!-- button for adding category -->
+                <a href="#" class="btn btn-primary mb-3"   data-bs-toggle="modal" data-bs-target="#addCategoryModal" >Lägg till kategori</a>
+                <!-- button for deleting the selected category -->
+                <a href="#" class="btn btn-danger mb-3" onclick="deleteCategory()">Ta bort kategori</a>
+                <!-- select category -->
+                <select class="form-select" id="categoryId" name="categoryId" onchange="getLinks()">
+                    <option value="" disabled selected>Välj en kategori</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.name +' - ' +category.lang}">
+                    </option>
+                </select>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <h1>Länkar</h1>
+                <!-- button for adding a link -->
+                <a href="#" class="btn btn-primary mb-3" data-bs-toggle="modal" id="addLinkButton" data-bs-target="#addLinkModal">Lägg till länk</a>
+
+                <!-- table of links -->
+                <table class="table table-striped">
+                    <thead>
+                    <tr>
+                        <th>Titel</th>
+                        <th>Beskrivning</th>
+                        <th>Kategori</th>
+                        <th>Land</th>
+                        <th>Region</th>
+                        <th>URL</th>
+                        <th>Åtgärd</th>
+                    </tr>
+                    </thead>
+                    <tbody id="linksTable">
+
+
+                    </tbody>
+
+
+            </div>
+            <script>
+                function getLinks() {
+                    var categoryId = document.getElementById("categoryId").value;
+                    $.ajax({
+                        type: "GET",
+                        url: "/user/links/getLinks",
+                        data: {
+                            categoryId: categoryId
+                        },
+                        success: function (data) {
+                            var tbody = document.getElementById("linksTable");
+                            tbody.innerHTML = ""; // Clear the table before populating
+                            data.forEach(link => {
+                                var tr = document.createElement("tr");
+                                tbody.appendChild(tr);
+
+                                var title = document.createElement("td");
+                                title.innerText = link.title;
+                                tr.appendChild(title);
+
+                                var description = document.createElement("td");
+                                description.innerHTML = link.description; // Render HTML if needed
+                                tr.appendChild(description);
+
+                                var category = document.createElement("td");
+                                category.innerText = link.categoryId;
+                                tr.appendChild(category);
+
+                                var country = document.createElement("td");
+                                country.innerText = link.countryId;
+                                tr.appendChild(country);
+
+                                var region = document.createElement("td");
+                                region.innerText = link.regionId;
+                                tr.appendChild(region);
+
+                                var url = document.createElement("td");
+                                var a = document.createElement("a");
+                                a.href = link.url;
+                                a.innerText = link.url;
+                                url.appendChild(a);
+                                tr.appendChild(url);
+
+                                var action = document.createElement("td");
+                                var deleteButton = document.createElement("button");
+                                deleteButton.className = "btn btn-danger";
+                                deleteButton.innerText = "Ta bort";
+                                deleteButton.setAttribute("onclick", `deleteLink(${link.id})`); // Add onclick with the link id
+                                action.appendChild(deleteButton);
+                                tr.appendChild(action);
+                            });
+                        },
+                        error: function (e) {
+                            alert("Något gick fel: " + e.responseText);
+                        }
+                    });
+                }
+
+                function deleteLink(linkId) {
+                    var result = confirm("Är du säker på att du vill ta bort länken?");
+                    if (result) {
+                        $.ajax({
+                            type: "POST",
+                            url: "/admin/links/deleteLink",
+                            data: { id: linkId }, // Pass the id directly
+                            success: function () {
+                                alert("Länken har tagits bort!");
+                                getLinks(); // Refresh the table
+                            },
+                            error: function (e) {
+                                alert("Något gick fel: " + e.responseText);
+                            }
+                        });
+                    }
+                }
+
+                document.getElementById("addLinkButton").addEventListener("click", function(event) {
+                    var categorySelected= document.getElementById("categoryId").value;
+                    if (categorySelected === null) {
+                        event.preventDefault(); // Förhindra standardbeteendet
+                        alert("Denna länk är inaktiverad!");
+                    }
+                });
+            </script>
+        </div>
+        <!-- Modal for adding link -->
+        <div class="modal fade" id="addLinkModal" tabindex="-1" role="dialog">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Lägg till länk</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form>
+                            <div class="mb-3">
+                                <label for="linkName" class="form-label>">Namn</label>
+                                <input type="text" class="form-control" id="linkName" name="linkName">
+                            </div>
+                            <div class="mb-3">
+                                <label for="linkUrl" class="form-label>">URL</label>
+                                <input type="text" class="form-control" id="linkUrl" name="linkUrl">
+                            </div>
+                            <div class="mb-3">
+                                <label for="linkDescription" class="form-label>">Beskrivning</label>
+                                <input type="text" class="form-control" id="linkDescription" name="linkDescription">
+                            </div>
+                            <div class="mb-3">
+                                <label for="region" class="form-label">Region</label>
+                                <select id="region" name="region">
+                                    <option value="" disabled selected>Välj region</option>
+                                    <option th:each="region : ${regions}"
+                                            th:value="${region.id}"
+                                            th:text="${region.name}">
+                                    </option>
+                                </select>
+                            </div>
+                            <div class="mb-3">
+                                <label for="linkLanguage" class="form-label">Språk</label>
+                                <select id="linkLanguage" name="linkLanguage">
+                                    <option value="" disabled selected>Välj ett språk</option>
+                                    <option th:each="lang : ${countries}"
+                                            th:value="${lang.id}"
+                                            th:text="${lang.name +' - ' +lang.code}">
+                                    </option>
+                                </select>
+                            </div>
+                            <button type="button" class="btn btn-primary" onclick="addLink()">Spara</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+            <!-- Modal for adding category -->
+            <div class="modal fade" id="addCategoryModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">Lägg till kategori</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="/admin/links/addCategory" method="post">
+                                <div class="mb-3">
+                                    <label for="categoryName" class="form-label>">Namn</label>
+                                    <input type="text" class="form-control" id="categoryName" name="categoryName">
+                                </div>
+                                <div class="mb-3">
+                                    <label for="categoryLang" class="form-label
+                                ">Språk</label>
+                                    <select id="categoryLang" name="categoryLang">
+                                        <option value="" disabled selected>Välj ett språk</option>
+                                        <option th:each="lang : ${countries}"
+                                                th:value="${lang.id}"
+                                                th:text="${lang.name +' - ' +lang.code}">
+                                        </option>
+                                    </select>
+                                </div>
+                                <button type="submit" class="btn btn-primary">Spara</button>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+                <script>
+                    function deleteCategory() {
+                        var categoryId = document.getElementById("categoryId");
+                        if (categoryId.value === null) {
+                            alert("Välj en kategori att ta bort");
+                        } else {
+                            var result = confirm("Är du säker på att du vill ta bort kategorin?");
+                            if (result) {
+                                window.location.href = "/admin/links/deleteCategory?id=" + categoryId.value;
+                            }
+                        }
+                    }
+                </script>
+                <script>
+                    function addLink() {
+                        var linkName = document.getElementById("linkName").value;
+                        var linkUrl = document.getElementById("linkUrl").value;
+                        var linkDescription = document.getElementById("linkDescription").value;
+                        var linkLanguage = document.getElementById("linkLanguage").value;
+                        var categoryId = document.getElementById("categoryId").value;
+                        var regionId = document.getElementById("region").value;
+
+                        $.ajax({
+                            type: "POST",
+                            url: "/admin/links/addLink",
+                            data: {
+                                title: linkName,
+                                url: linkUrl,
+                                description: linkDescription,
+                                countryId: linkLanguage,
+                                categoryId: categoryId,
+                                regionId: regionId
+                            },
+                            success: function (data) {
+                                alert("Länken har lagts till!");
+                                location.reload();
+                            },
+                            error: function (e) {
+                                alert("Något gick fel: " + e.responseText);
+                            }
+                        });
+                    }
+
+                </script>
+            </div>
+        </div>

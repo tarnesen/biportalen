@@ -1,0 +1,37 @@
+spring:
+  application:
+    name: biportalen2
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+    servlet:
+      content-type: text/html; charset=UTF-8
+  messages:
+    basename: messages
+    encoding: UTF-8
+  datasource:
+    url: jdbc:mariadb://tega.se:3306/biportalen2
+    username: thar02
+    password: Therese%155tga!
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 10000 # Millisekunder, kopplingar återvinns efter 10 sekunder inaktivitet
+      max-lifetime: 1800000 # Millisekunder, kopplingar återvinns efter 30 minuter
+      connection-timeout: 30000 # Millisekunder, timeout för att få en anslutning
+      validation-query: SELECT 1
+      test-on-borrow: true
+  jpa:
+    properties:
+      hibernate.connection.provider_disables_autocommit: true
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+server:
+  port: 8081
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
